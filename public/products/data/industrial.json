@@ -1,0 +1,88 @@
+{
+  "category": "industrial",
+  "categoryName": "Industrial Robots",
+  "products": [
+    {
+      "id": "industrial-001",
+      "name": "RoboArm X1",
+      "shortDescription": "High-precision industrial robotic arm",
+      "description": "The RoboArm X1 is a state-of-the-art industrial robotic arm designed for high-precision manufacturing tasks. With its advanced AI-powered control system and exceptional repeatability, it's perfect for assembly lines, welding, and precision manufacturing.",
+      "price": 29999.99,
+      "currency": "USD",
+      "images": [
+        "/products/images/industrial/roboarm-x1-main.jpg",
+        "/products/images/industrial/roboarm-x1-side.jpg",
+        "/products/images/industrial/roboarm-x1-action.jpg"
+      ],
+      "specifications": {
+        "weight": "45kg",
+        "reach": "1.2m",
+        "payload": "10kg",
+        "repeatability": "±0.02mm",
+        "powerConsumption": "2.5kW",
+        "workingTemperature": "-10°C to 50°C",
+        "connectivity": "Ethernet, Wi-Fi, RS485"
+      },
+      "features": [
+        "6-axis movement capability",
+        "AI-powered precision control",
+        "Integrated safety sensors",
+        "Remote monitoring and diagnostics",
+        "Collision detection",
+        "Programming via teach pendant"
+      ],
+      "inStock": true,
+      "stockCount": 15,
+      "tags": ["manufacturing", "precision", "automation", "ai-powered"],
+      "rating": 4.8,
+      "reviews": 124,
+      "warranty": "3 years comprehensive",
+      "shipping": {
+        "weight": "50kg",
+        "dimensions": "120x80x60cm",
+        "freeShipping": true,
+        "estimatedDelivery": "5-7 business days"
+      }
+    },
+    {
+      "id": "industrial-002",
+      "name": "WeldBot Pro",
+      "shortDescription": "Automated welding robot system",
+      "description": "Professional-grade welding robot designed for continuous operation in industrial environments. Features advanced seam tracking and adaptive welding parameters for consistent, high-quality welds.",
+      "price": 45999.99,
+      "currency": "USD",
+      "images": [
+        "/products/images/industrial/weldbot-pro-main.jpg",
+        "/products/images/industrial/weldbot-pro-working.jpg"
+      ],
+      "specifications": {
+        "weight": "75kg",
+        "reach": "1.8m",
+        "weldingCapacity": "Up to 12mm steel",
+        "powerConsumption": "5.5kW",
+        "weldingProcesses": "MIG, TIG, Stick",
+        "operatingHours": "24/7 continuous"
+      },
+      "features": [
+        "Seam tracking technology",
+        "Adaptive welding parameters",
+        "Fume extraction system",
+        "Safety curtain integration",
+        "Quality monitoring",
+        "Multi-process capability"
+      ],
+      "inStock": true,
+      "stockCount": 8,
+      "tags": ["welding", "continuous-operation", "quality-control"],
+      "rating": 4.6,
+      "reviews": 87,
+      "warranty": "5 years parts and labor",
+      "shipping": {
+        "weight": "85kg",
+        "dimensions": "200x120x80cm",
+        "freeShipping": true,
+        "estimatedDelivery": "7-10 business days"
+      }
+    }
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "category": "connectivity",
+  "categoryName": "Connectivity Modules",
+  "products": [
+    {
+      "id": "connectivity-001",
+      "name": "WiFi-Pro 6E Module",
+      "shortDescription": "Next-generation WiFi 6E connectivity for robots",
+      "description": "Advanced WiFi 6E module providing ultra-fast wireless connectivity with extended range and reduced latency. Perfect for high-bandwidth applications and real-time robot control.",
+      "price": 159.99,
+      "currency": "USD",
+      "images": [
+        "/products/images/connectivity/wifi-main.jpg",
+        "/products/images/connectivity/wifi-antenna.jpg"
+      ],
+      "specifications": {
+        "standard": "802.11ax (WiFi 6E)",
+        "frequency": "2.4GHz, 5GHz, 6GHz",
+        "dataRate": "Up to 2.4 Gbps",
+        "range": "150m (open field)",
+        "security": "WPA3, WPA2",
+        "powerConsumption": "450mA @ 3.3V",
+        "interface": "UART/SPI"
+      },
+      "features": [
+        "WiFi 6E with 6GHz support",
+        "Ultra-low latency",
+        "Extended range capability",
+        "Advanced security protocols",
+        "Multiple antenna support",
+        "Easy integration API"
+      ],
+      "inStock": true,
+      "stockCount": 78,
+      "tags": ["wifi6e", "low-latency", "high-speed", "secure"],
+      "rating": 4.8,
+      "reviews": 167,
+      "warranty": "2 years manufacturer",
+      "shipping": {
+        "weight": "0.1kg",
+        "dimensions": "4x3x1cm",
+        "freeShipping": true,
+        "estimatedDelivery": "1-2 business days"
+      }
+    },
+    {
+      "id": "connectivity-002",
+      "name": "BlueLink Pro Bluetooth 5.3",
+      "shortDescription": "Advanced Bluetooth 5.3 module with mesh networking",
+      "description": "Professional Bluetooth 5.3 module featuring mesh networking capabilities, extended range, and low energy consumption. Ideal for IoT applications and robot-to-robot communication.",
+      "price": 79.99,
+      "currency": "USD",
+      "images": [
+        "/products/images/connectivity/bluetooth-main.jpg",
+        "/products/images/connectivity/bluetooth-pcb.jpg"
+      ],
+      "specifications": {
+        "version": "Bluetooth 5.3",
+        "range": "240m (line of sight)",
+        "dataRate": "2 Mbps",
+        "meshNodes": "Up to 32,000",
+        "powerConsumption": "1.8mA active",
+        "sleepCurrent": "0.9µA",
+        "interface": "UART"
+      },
+      "features": [
+        "Bluetooth 5.3 latest standard",
+        "Mesh networking support",
+        "Extended communication range",
+        "Ultra-low power consumption",
+        "Over-the-air updates",
+        "Multiple security layers"
+      ],
+      "inStock": true,
+      "stockCount": 125,
+      "tags": ["bluetooth5.3", "mesh-network", "low-energy", "iot"],
+      "rating": 4.6,
+      "reviews": 234,
+      "warranty": "18 months standard",
+      "shipping": {
+        "weight": "0.08kg",
+        "dimensions": "3x2x1cm",
+        "freeShipping": true,
+        "estimatedDelivery": "1-2 business days"
+      }
+    },
+    {
+      "id": "connectivity-003",
+      "name": "TouchLink NFC Reader",
+      "shortDescription": "High-performance NFC reader for contactless interaction",
+      "description": "Professional NFC reader module enabling contactless communication and data exchange. Features support for multiple NFC standards and secure authentication protocols.",
+      "price": 129.99,
+      "currency": "USD",
+      "images": [
+        "/products/images/connectivity/nfc-main.jpg",
+        "/products/images/connectivity/nfc-interaction.jpg"
+      ],
+      "specifications": {
+        "standards": "ISO14443A/B, ISO15693",
+        "frequency": "13.56 MHz",
+        "readRange": "Up to 10cm",
+        "dataRate": "424 kbps",
+        "interface": "I2C/SPI/UART",
+        "voltage": "3.3V to 5V",
+        "antennaSize": "25x25mm"
+      },
+      "features": [
+        "Multi-standard support",
+        "Secure authentication",
+        "Adjustable RF output",
+        "Multiple interface options",
+        "Card emulation mode",
+        "Peer-to-peer communication"
+      ],
+      "inStock": true,
+      "stockCount": 56,
+      "tags": ["contactless", "secure", "multi-standard", "authentication"],
+      "rating": 4.4,
+      "reviews": 89,
+      "warranty": "2 years comprehensive",
+      "shipping": {
+        "weight": "0.15kg",
+        "dimensions": "5x4x2cm",
+        "freeShipping": true,
+        "estimatedDelivery": "1-3 business days"
+      }
+    }
+  ]
+}

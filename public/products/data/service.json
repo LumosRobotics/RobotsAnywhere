@@ -1,0 +1,47 @@
+{
+  "category": "service",
+  "categoryName": "Service Robots",
+  "products": [
+    {
+      "id": "service-001",
+      "name": "HostBot Reception",
+      "shortDescription": "AI-powered reception and customer service robot",
+      "description": "HostBot Reception is an intelligent service robot designed to welcome guests, provide information, and assist with basic customer service tasks in hotels, offices, and public spaces.",
+      "price": 12999.99,
+      "currency": "USD",
+      "images": [
+        "/products/images/service/hostbot-main.jpg",
+        "/products/images/service/hostbot-interaction.jpg"
+      ],
+      "specifications": {
+        "height": "1.6m",
+        "weight": "35kg",
+        "batteryLife": "12 hours",
+        "chargingTime": "3 hours",
+        "displaySize": "15.6 inch touchscreen",
+        "voiceLanguages": "50+ languages",
+        "connectivity": "Wi-Fi, 4G, Bluetooth"
+      },
+      "features": [
+        "Natural language processing",
+        "Facial recognition",
+        "Multi-language support",
+        "Interactive touchscreen",
+        "Navigation and mapping",
+        "Voice synthesis"
+      ],
+      "inStock": true,
+      "stockCount": 22,
+      "tags": ["hospitality", "ai", "customer-service", "multilingual"],
+      "rating": 4.5,
+      "reviews": 156,
+      "warranty": "2 years comprehensive",
+      "shipping": {
+        "weight": "40kg",
+        "dimensions": "60x60x170cm",
+        "freeShipping": true,
+        "estimatedDelivery": "3-5 business days"
+      }
+    }
+  ]
+}

@@ -13,7 +13,6 @@ const ProductCard = ({ product, onProductClick }) => {
   const handleAddToCart = (e) => {
     e.stopPropagation(); // Prevent card click
     addToCart(product, 1);
-    alert(`Added ${product.name} to cart!`);
   };
 
   const formatPrice = (price) => {
@@ -55,22 +54,12 @@ const ProductCard = ({ product, onProductClick }) => {
         <h3 className="product-name">{product.name}</h3>
         <p className="product-description">{product.shortDescription}</p>
         
-        <div className="product-rating">
-          <span className="stars">{renderStars(product.rating)}</span>
-          <span className="rating-text">({product.reviews} reviews)</span>
-        </div>
         
         <div className="product-price">
           <span className="price">{formatPrice(product.price)}</span>
           {product.inStock && (
             <span className="stock-info">{product.stockCount} in stock</span>
           )}
-        </div>
-        
-        <div className="product-tags">
-          {product.tags.slice(0, 3).map((tag, index) => (
-            <span key={index} className="tag">{tag}</span>
-          ))}
         </div>
         
         <button 

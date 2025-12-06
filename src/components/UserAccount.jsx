@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 
-const UserAccount = ({ view = 'profile', onBack }) => {
+const UserAccount = ({ onBack }) => {
+  const { view = 'profile' } = useParams();
+  const navigate = useNavigate();
   const { user, updateProfile } = useUser();
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
@@ -230,8 +233,8 @@ const UserAccount = ({ view = 'profile', onBack }) => {
               <div className="order-items">
                 {order.items.map(item => (
                   <div key={item.product.id} className="order-item">
-                    <img 
-                      src={item.product.images[0]} 
+                    <img
+                      src={item.product.images[0]}
                       alt={item.product.name}
                       onError={(e) => {
                         e.target.src = '/api/placeholder/50/50';
@@ -245,6 +248,61 @@ const UserAccount = ({ view = 'profile', onBack }) => {
                   </div>
                 ))}
               </div>
+              {/* Shipping & Tracking Information */}
+              {order.shipping_method && (
+                <div className="order-shipping-info">
+                  <h4>Shipping Information</h4>
+                  <div className="shipping-details">
+                    <div className="shipping-detail-row">
+                      <span className="detail-label">Method:</span>
+                      <span className="detail-value">
+                        {order.shipping_method.serviceName || order.shipping_method.name || 'Standard Shipping'}
+                      </span>
+                    </div>
+                    {order.courier_name && (
+                      <div className="shipping-detail-row">
+                        <span className="detail-label">Courier:</span>
+                        <span className="detail-value">{order.courier_name}</span>
+                      </div>
+                    )}
+                    {order.tracking_number && (
+                      <div className="shipping-detail-row">
+                        <span className="detail-label">Tracking:</span>
+                        <span className="detail-value tracking-number">
+                          {order.tracking_url ? (
+                            <a href={order.tracking_url} target="_blank" rel="noopener noreferrer">
+                              {order.tracking_number}
+                            </a>
+                          ) : (
+                            order.tracking_number
+                          )}
+                        </span>
+                      </div>
+                    )}
+                    {order.estimated_delivery_date && (
+                      <div className="shipping-detail-row">
+                        <span className="detail-label">Estimated Delivery:</span>
+                        <span className="detail-value">{formatDate(order.estimated_delivery_date)}</span>
+                      </div>
+                    )}
+                    {order.shipment_status && order.shipment_status !== 'pending' && (
+                      <div className="shipping-detail-row">
+                        <span className="detail-label">Shipment Status:</span>
+                        <span className={`detail-value shipment-status status-${order.shipment_status}`}>
+                          {order.shipment_status.charAt(0).toUpperCase() + order.shipment_status.slice(1).replace('_', ' ')}
+                        </span>
+                      </div>
+                    )}
+                    {order.label_url && (
+                      <div className="shipping-detail-row">
+                        <a href={order.label_url} target="_blank" rel="noopener noreferrer" className="label-link">
+                          View Shipping Label
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -315,21 +373,21 @@ const UserAccount = ({ view = 'profile', onBack }) => {
       </div>
 
       <div className="account-tabs">
-        <button 
+        <button
           className={`tab-btn ${view === 'profile' ? 'active' : ''}`}
-          onClick={() => {}}
+          onClick={() => navigate('/account/profile')}
         >
           👤 Profile
         </button>
-        <button 
+        <button
           className={`tab-btn ${view === 'orders' ? 'active' : ''}`}
-          onClick={() => {}}
+          onClick={() => navigate('/account/orders')}
         >
           📦 Orders
         </button>
-        <button 
+        <button
           className={`tab-btn ${view === 'settings' ? 'active' : ''}`}
-          onClick={() => {}}
+          onClick={() => navigate('/account/settings')}
         >
           ⚙️ Settings
         </button>

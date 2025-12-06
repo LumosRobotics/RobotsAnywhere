@@ -40,15 +40,6 @@
       "rating": 4.7,
       "reviews": 203,
       "warranty": "2 years parts and labor",
-      "weight": 32,
-      "dimensions": {
-        "length": 80,
-        "width": 60,
-        "height": 40,
-        "unit": "cm"
-      },
-      "hsCode": "8508.11.00",
-      "originCountry": "US",
       "shipping": {
         "weight": "32kg",
         "dimensions": "80x60x40cm",

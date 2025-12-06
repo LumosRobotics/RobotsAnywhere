@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useCart } from '../contexts/CartContext';
 import ProductCard from './ProductCard';
 
 const ProductList = ({ category, onProductSelect }) => {
+  const { addToCart } = useCart();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

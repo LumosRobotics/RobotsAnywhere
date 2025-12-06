@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Breadcrumb = ({ currentPage, selectedCategory, selectedProduct, onNavigate }) => {
+const Breadcrumb = ({ currentPage, selectedCategory, selectedProduct, searchQuery, onNavigate }) => {
   const getCategoryName = (categoryId) => {
     const categories = {
       sensors: 'Sensors',
@@ -53,6 +53,12 @@ const Breadcrumb = ({ currentPage, selectedCategory, selectedProduct, onNavigate
     } else if (currentPage === 'account') {
       breadcrumbs.push({
         label: 'Account',
+        onClick: null,
+        isActive: true
+      });
+    } else if (currentPage === 'search') {
+      breadcrumbs.push({
+        label: `Search: "${searchQuery}"`,
         onClick: null,
         isActive: true
       });

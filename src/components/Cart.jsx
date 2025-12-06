@@ -1,17 +1,19 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { useUser } from '../contexts/UserContext';
 
 const Cart = ({ onClose }) => {
-  const { 
-    items, 
-    removeFromCart, 
-    updateQuantity, 
-    clearCart, 
-    getCartTotal, 
-    getCartItemCount 
+  const navigate = useNavigate();
+  const {
+    items,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+    getCartTotal,
+    getCartItemCount
   } = useCart();
-  const { isAuthenticated, addOrder } = useUser();
+  const { isAuthenticated } = useUser();
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-US', {
@@ -33,27 +35,15 @@ const Cart = ({ onClose }) => {
       alert('Your cart is empty!');
       return;
     }
-    
+
     if (!isAuthenticated) {
       alert('Please sign in to continue with checkout');
       return;
     }
-    
-    // Create order
-    const order = addOrder({
-      items: items.map(item => ({
-        product: item.product,
-        quantity: item.quantity
-      })),
-      total: getCartTotal(),
-      status: 'pending'
-    });
-    
-    // Clear cart after successful order
-    clearCart();
-    
-    alert(`Order #${order.id} placed successfully! Total: ${formatPrice(order.total)}`);
+
+    // Close cart modal and navigate to checkout
     onClose();
+    navigate('/checkout');
   };
 
   if (items.length === 0) {
@@ -154,10 +144,10 @@ const Cart = ({ onClose }) => {
           </div>
           <div className="total-row">
             <span className="total-label">Shipping:</span>
-            <span className="total-value">Free</span>
+            <span className="total-value shipping-note">Calculated at checkout</span>
           </div>
           <div className="total-row total-final">
-            <span className="total-label">Total:</span>
+            <span className="total-label">Estimated Total:</span>
             <span className="total-value">{formatPrice(getCartTotal())}</span>
           </div>
         </div>

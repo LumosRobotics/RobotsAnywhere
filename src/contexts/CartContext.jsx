@@ -95,7 +95,6 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = (product, quantity = 1) => {
     if (!product.inStock) {
-      alert('This product is currently out of stock');
       return;
     }
     

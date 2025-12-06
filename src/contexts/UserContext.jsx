@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { createShipment } from '../services/easyship';
 
 const UserContext = createContext();
 
@@ -285,64 +286,43 @@ export const UserProvider = ({ children }) => {
       return { success: false, error: error.message };
     }
     
-    // Check if user needs email confirmation
-    if (!data.user.email_confirmed_at && !data.session) {
-      console.log('User registration successful, but email confirmation required');
-      dispatch({ type: 'REGISTER_SUCCESS', payload: { 
-        user: {
-          id: data.user.id,
-          email: data.user.email,
-          firstName: userData.firstName,
-          lastName: userData.lastName,
-          phone: userData.phone,
-          address: userData.address || {
-            street: '',
-            city: '',
-            state: '',
-            zipCode: '',
-            country: 'USA'
-          },
-          createdAt: data.user.created_at,
-          emailConfirmed: false
-        }
-      }});
-      return { 
-        success: true, 
-        message: 'Account created! Please check your email to confirm your account.' 
-      };
-    }
+    // Always require email confirmation - don't auto-login
+    console.log('User registration successful, email confirmation required');
     
-    // If user is immediately confirmed, create profile
+    // Store user data temporarily for profile creation after confirmation
     try {
       await createUserProfile(data.user.id, userData);
+      console.log('Profile created for unconfirmed user');
     } catch (profileError) {
       console.error('Failed to create profile:', profileError);
-      // Still consider registration successful, profile can be created later
+      // Continue anyway, profile can be created when user confirms
     }
     
-    const userWithProfile = {
-      id: data.user.id,
-      email: data.user.email,
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      phone: userData.phone,
-      address: userData.address || {
-        street: '',
-        city: '',
-        state: '',
-        zipCode: '',
-        country: 'USA'
-      },
-      createdAt: data.user.created_at
-    };
+    // Don't set user as authenticated, just clear loading state
+    dispatch({ type: 'SET_LOADING', payload: { isLoading: false } });
     
-    dispatch({ type: 'REGISTER_SUCCESS', payload: { user: userWithProfile } });
-    return { success: true };
+    return { 
+      success: true, 
+      message: 'An email has been sent to the email address you provided. Please confirm your email to complete registration.',
+      requiresConfirmation: true
+    };
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
-    dispatch({ type: 'LOGOUT' });
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Logout error:', error);
+        return { success: false, error: error.message };
+      }
+      // Let the onAuthStateChange listener handle the state update
+      return { success: true };
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Force local logout if Supabase call fails
+      dispatch({ type: 'LOGOUT' });
+      return { success: false, error: error.message };
+    }
   };
 
   const updateProfile = async (updates) => {
@@ -382,44 +362,105 @@ export const UserProvider = ({ children }) => {
 
   const addOrder = async (orderData) => {
     if (!state.user) return null;
-    
-    // Create order in Supabase
-    const { data: order, error: orderError } = await supabase
-      .from('orders')
-      .insert({
-        user_id: state.user.id,
-        total: orderData.total,
-        status: 'pending',
-        shipping_address: state.user.address
-      })
-      .select()
-      .single();
-    
-    if (orderError) {
-      console.error('Order creation error:', orderError);
+
+    try {
+      // Create order in Supabase with shipping information
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: state.user.id,
+          subtotal: orderData.subtotal,
+          shipping_cost: orderData.shippingCost || 0,
+          taxes_duties: orderData.taxesDuties || 0,
+          total: orderData.total,
+          status: 'pending',
+          shipping_address: orderData.shippingAddress || state.user.address,
+          shipping_method: orderData.shippingMethod || null,
+          shipment_status: 'pending'
+        })
+        .select()
+        .single();
+
+      if (orderError) {
+        console.error('Order creation error:', orderError);
+        return null;
+      }
+
+      // Create order items
+      const orderItems = orderData.items.map(item => ({
+        order_id: order.id,
+        product_data: item.product,
+        quantity: item.quantity,
+        price: item.product.price
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+
+      if (itemsError) {
+        console.error('Order items creation error:', itemsError);
+      }
+
+      // Create shipment with EasyShip if shipping method is selected
+      if (orderData.shippingMethod && orderData.shippingAddress) {
+        try {
+          const shipmentData = {
+            orderId: order.id,
+            courier: orderData.shippingMethod.courierData || {
+              courier_id: orderData.shippingMethod.id,
+              courier_name: orderData.shippingMethod.name
+            },
+            recipient: {
+              name: `${state.user.firstName} ${state.user.lastName}`,
+              email: state.user.email,
+              phone: state.user.phone || '',
+              address: orderData.shippingAddress
+            },
+            items: orderData.items
+          };
+
+          const shipmentResult = await createShipment(shipmentData);
+
+          if (shipmentResult.success) {
+            // Update order with shipment information
+            const { error: updateError } = await supabase
+              .from('orders')
+              .update({
+                shipment_id: shipmentResult.shipment.id,
+                tracking_number: shipmentResult.shipment.trackingNumber,
+                tracking_url: shipmentResult.shipment.trackingNumber
+                  ? `https://track.easyship.com/${shipmentResult.shipment.id}`
+                  : null,
+                label_url: shipmentResult.shipment.labelUrl,
+                courier_name: shipmentResult.shipment.courierName,
+                estimated_delivery_date: shipmentResult.shipment.estimatedDelivery,
+                shipment_status: 'created'
+              })
+              .eq('id', order.id);
+
+            if (updateError) {
+              console.error('Failed to update order with shipment info:', updateError);
+            }
+          } else {
+            console.error('Shipment creation failed:', shipmentResult.error);
+            // Order still created, but shipment creation failed
+            // Could notify admin or retry later
+          }
+        } catch (shipmentError) {
+          console.error('Error creating shipment:', shipmentError);
+          // Order still valid, shipment can be created manually later
+        }
+      }
+
+      return {
+        ...order,
+        items: orderData.items
+      };
+    } catch (error) {
+      console.error('Error in addOrder:', error);
       return null;
     }
-    
-    // Create order items
-    const orderItems = orderData.items.map(item => ({
-      order_id: order.id,
-      product_data: item.product,
-      quantity: item.quantity,
-      price: item.product.price
-    }));
-    
-    const { error: itemsError } = await supabase
-      .from('order_items')
-      .insert(orderItems);
-    
-    if (itemsError) {
-      console.error('Order items creation error:', itemsError);
-    }
-    
-    return {
-      ...order,
-      items: orderData.items
-    };
   };
 
   const value = {

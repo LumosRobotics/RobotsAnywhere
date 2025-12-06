@@ -1,45 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import ProductList from './ProductList';
 import ProductDetail from './ProductDetail';
 
-const Products = ({ selectedCategory, selectedProduct, onCategorySelect, onProductSelect }) => {
-  const getCurrentView = () => {
-    if (selectedProduct) return 'detail';
-    if (selectedCategory) return 'products';
-    return 'categories';
-  };
-
-  const currentView = getCurrentView();
+const Products = () => {
+  const { category, productId } = useParams();
+  const navigate = useNavigate();
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const categories = [
     { id: 'sensors', name: 'Sensors', description: 'Accelerometer, gyroscope, proximity, and ambient light sensors' },
-    { id: 'actuators', name: 'Actuators', description: 'Servo motors, vibrators, flashlights, and buzzers' },
-    { id: 'connectivity', name: 'Connectivity', description: 'WiFi, Bluetooth, and NFC communication modules' },
-    { id: 'location', name: 'Location', description: 'GPS receivers and geofencing systems' },
-    { id: 'camera', name: 'Camera', description: 'Vision systems, image capture, and video recording' },
-    { id: 'industrial', name: 'Industrial Robots', description: 'High-precision manufacturing and automation' },
-    { id: 'service', name: 'Service Robots', description: 'Customer service and hospitality solutions' },
-    { id: 'cleaning', name: 'Cleaning Robots', description: 'Automated cleaning and maintenance' }
+    { id: 'cleaning', name: 'Cleaning Robots', description: 'Automated cleaning and maintenance' },
+    { id: 'development-boards', name: 'Development Boards', description: 'Microcontrollers and development kits' }
   ];
 
+  // Load product if productId is in URL
+  useEffect(() => {
+    if (category && productId) {
+      setLoading(true);
+      fetch(`/products/data/${category}.json`)
+        .then(res => res.json())
+        .then(data => {
+          const product = data.products.find(p => p.id === productId);
+          if (product) {
+            product.categoryId = category;
+            product.categoryName = data.categoryName;
+            setSelectedProduct(product);
+          }
+          setLoading(false);
+        })
+        .catch(error => {
+          console.error('Error loading product:', error);
+          setLoading(false);
+        });
+    } else {
+      setSelectedProduct(null);
+    }
+  }, [category, productId]);
+
   const handleCategorySelect = (categoryId) => {
-    onCategorySelect(categoryId);
+    navigate(`/products/${categoryId}`);
   };
 
   const handleProductSelect = (product) => {
-    onProductSelect(product);
+    navigate(`/products/${product.categoryId || category}/${product.id}`);
   };
 
   const handleBackToProducts = () => {
-    onProductSelect(null);
+    navigate(`/products/${category}`);
   };
 
   const handleBackToCategories = () => {
-    onCategorySelect(null);
+    navigate('/products');
   };
 
 
-  if (currentView === 'detail') {
+  if (loading) {
+    return <div className="loading">Loading...</div>;
+  }
+
+  if (selectedProduct) {
     return (
       <ProductDetail
         product={selectedProduct}
@@ -48,14 +69,11 @@ const Products = ({ selectedCategory, selectedProduct, onCategorySelect, onProdu
     );
   }
 
-  if (currentView === 'products') {
+  if (category) {
     return (
       <div className="products-container">
-        <button className="back-button" onClick={handleBackToCategories}>
-          ← Back to Categories
-        </button>
         <ProductList
-          category={selectedCategory}
+          category={category}
           onProductSelect={handleProductSelect}
         />
       </div>

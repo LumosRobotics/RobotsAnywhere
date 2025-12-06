@@ -3,6 +3,8 @@ import { useUser } from '../contexts/UserContext';
 
 const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
   const [mode, setMode] = useState(initialMode);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [confirmationMessage, setConfirmationMessage] = useState('');
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -27,43 +29,64 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    if (mode === 'register') {
-      if (formData.password !== formData.confirmPassword) {
-        alert('Passwords do not match');
-        setIsSubmitting(false);
-        return;
-      }
-      
-      const result = await register({
-        email: formData.email,
-        password: formData.password,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phone: formData.phone,
-        address: {
-          street: '',
-          city: '',
-          state: '',
-          zipCode: '',
-          country: 'USA'
+    try {
+      if (mode === 'register') {
+        if (formData.password !== formData.confirmPassword) {
+          alert('Passwords do not match');
+          setIsSubmitting(false);
+          return;
         }
-      });
-      
-      if (result.success) {
-        onClose();
+
+        const result = await register({
+          email: formData.email,
+          password: formData.password,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formData.phone,
+          address: {
+            street: '',
+            city: '',
+            state: '',
+            zipCode: '',
+            country: 'USA'
+          }
+        });
+
+        if (result.success && result.requiresConfirmation) {
+          setConfirmationMessage(result.message);
+          setShowConfirmation(true);
+          setFormData({
+            email: '',
+            password: '',
+            firstName: '',
+            lastName: '',
+            phone: '',
+            confirmPassword: ''
+          });
+        } else if (result.success) {
+          handleClose();
+        } else if (result.error) {
+          console.error('Registration error:', result.error);
+        }
+      } else {
+        const result = await login(formData.email, formData.password);
+        if (result.success) {
+          handleClose();
+        } else if (result.error) {
+          console.error('Login error:', result.error);
+        }
       }
-    } else {
-      const result = await login(formData.email, formData.password);
-      if (result.success) {
-        onClose();
-      }
+    } catch (err) {
+      console.error('Unexpected error during authentication:', err);
     }
-    
+
     setIsSubmitting(false);
   };
 
   const switchMode = () => {
     setMode(mode === 'login' ? 'register' : 'login');
+    setShowConfirmation(false);
+    setConfirmationMessage('');
     setFormData({
       email: '',
       password: '',
@@ -75,20 +98,68 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
     clearError();
   };
 
+  const handleCloseConfirmation = () => {
+    setShowConfirmation(false);
+    setConfirmationMessage('');
+    onClose();
+  };
+
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
-      onClose();
+      handleClose();
     }
   };
 
+  const handleClose = () => {
+    // Reset all state when closing the modal
+    setIsSubmitting(false);
+    setShowConfirmation(false);
+    setConfirmationMessage('');
+    setFormData({
+      email: '',
+      password: '',
+      firstName: '',
+      lastName: '',
+      phone: '',
+      confirmPassword: ''
+    });
+    clearError();
+    onClose();
+  };
+
   if (!isOpen) return null;
+
+  // Show confirmation message after successful registration
+  if (showConfirmation) {
+    return (
+      <div className="auth-overlay" onClick={handleOverlayClick}>
+        <div className="auth-modal">
+          <div className="auth-header">
+            <h2>Check Your Email</h2>
+            <button className="close-auth-btn" onClick={handleCloseConfirmation}>×</button>
+          </div>
+          <div className="confirmation-content">
+            <div className="confirmation-icon">📧</div>
+            <p className="confirmation-message">{confirmationMessage}</p>
+            <button 
+              type="button" 
+              className="auth-submit-btn" 
+              onClick={handleCloseConfirmation}
+            >
+              Got it!
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="auth-overlay" onClick={handleOverlayClick}>
       <div className="auth-modal">
         <div className="auth-header">
           <h2>{mode === 'login' ? 'Sign In' : 'Create Account'}</h2>
-          <button className="close-auth-btn" onClick={onClose}>×</button>
+          <button className="close-auth-btn" onClick={handleClose}>×</button>
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
@@ -133,7 +204,6 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
               onChange={handleInputChange}
               required
               disabled={isSubmitting}
-              placeholder={mode === 'login' ? 'demo@robotsanywhere.com' : ''}
             />
           </div>
 
@@ -162,7 +232,6 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
               onChange={handleInputChange}
               required
               disabled={isSubmitting}
-              placeholder={mode === 'login' ? 'demo123' : ''}
             />
           </div>
 
@@ -184,14 +253,6 @@ const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
           {error && (
             <div className="auth-error">
               {error}
-            </div>
-          )}
-
-          {mode === 'login' && (
-            <div className="demo-credentials">
-              <p><strong>Demo Account:</strong></p>
-              <p>Email: demo@robotsanywhere.com</p>
-              <p>Password: demo123</p>
             </div>
           )}
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useCart } from '../contexts/CartContext';
 import { useUser } from '../contexts/UserContext';
 
-const Header = ({ onNavClick, onCartClick, onAuthClick, onAccountClick, onCategorySelect }) => {
+const Header = ({ onNavClick, onCartClick, onAuthClick, onAccountClick, onCategorySelect, onSearch, onCategoryClick }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -11,9 +11,8 @@ const Header = ({ onNavClick, onCartClick, onAuthClick, onAccountClick, onCatego
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (searchTerm.trim()) {
-      console.log('Searching for:', searchTerm);
-      // Add search functionality here
+    if (searchTerm.trim() && onSearch) {
+      onSearch(searchTerm.trim());
     }
   };
 
@@ -25,9 +24,14 @@ const Header = ({ onNavClick, onCartClick, onAuthClick, onAccountClick, onCatego
     setIsAccountDropdownOpen(!isAccountDropdownOpen);
   };
 
-  const handleLogout = () => {
-    logout();
-    setIsAccountDropdownOpen(false);
+  const handleLogout = async () => {
+    try {
+      await logout();
+      setIsAccountDropdownOpen(false);
+    } catch (error) {
+      console.error('Logout failed:', error);
+      setIsAccountDropdownOpen(false);
+    }
   };
 
   const handleAccountAction = (action) => {
@@ -65,23 +69,28 @@ const Header = ({ onNavClick, onCartClick, onAuthClick, onAccountClick, onCatego
     { id: 'location', name: 'Location' },
     { id: 'camera', name: 'Camera' },
     { id: 'industrial', name: 'Industrial Robots' },
-    { id: 'service', name: 'Service Robots' },
-    { id: 'cleaning', name: 'Cleaning Robots' }
+    { id: 'service', name: 'Service Robots' }
   ];
 
   return (
     <header className="header">
       <div className="header-content">
-        <button className="hamburger-menu" onClick={toggleMenu}>
-          <div className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></div>
-          <div className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></div>
-          <div className={`hamburger-line ${isMenuOpen ? 'open' : ''}`}></div>
-        </button>
-        
         <div className="logo" onClick={(e) => onNavClick(e, 'home')}>
-          <img src="/Robotsdigitalcoverart.webp" alt="Robots Anywhere Logo" />
+          <img src="/RobotsAnywhereLogo.png" alt="Robots Anywhere Logo" />
         </div>
-        
+
+        <div className="header-nav">
+          <button className="header-nav-button" onClick={toggleMenu}>
+            Products
+          </button>
+          <button className="header-nav-button" onClick={(e) => onNavClick && onNavClick(e, 'about')}>
+            About
+          </button>
+          <button className="header-nav-button" onClick={(e) => onNavClick && onNavClick(e, 'contact')}>
+            Contact
+          </button>
+        </div>
+
         <form className="search-bar" onSubmit={handleSearch}>
           <input
             type="text"
@@ -91,16 +100,13 @@ const Header = ({ onNavClick, onCartClick, onAuthClick, onAccountClick, onCatego
             className="search-input"
           />
           <button type="submit" className="search-button">
-            🔍
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="6.5" cy="6.5" r="5" stroke="black" strokeWidth="1.5"/>
+              <line x1="10.5" y1="10.5" x2="14.5" y2="14.5" stroke="black" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
           </button>
         </form>
         
-        <button className="cart-button" onClick={onCartClick}>
-          <span className="cart-icon">🛒</span>
-          {getCartItemCount() > 0 && (
-            <span className="cart-counter">{getCartItemCount()}</span>
-          )}
-        </button>
 
         <div className="account-section">
           {isAuthenticated ? (

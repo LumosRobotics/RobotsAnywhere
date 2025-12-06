@@ -1,0 +1,118 @@
+{
+  "category": "development-boards",
+  "categoryName": "Development Boards",
+  "products": [
+    {
+      "id": "dev-boards-001",
+      "name": "RoboCore ARM Cortex-M7 Board",
+      "shortDescription": "High-performance ARM development board for robotics",
+      "description": "Professional robotics development board featuring ARM Cortex-M7 processor at 216MHz. Includes extensive I/O options, built-in motion control peripherals, and real-time operating system support for complex robotic applications.",
+      "price": 89.99,
+      "currency": "USD",
+      "images": [
+        "/products/images/development-boards/due_main.webp",
+        "/products/images/development-boards/due_sub0.jpeg"
+      ],
+      "specifications": {
+        "processor": "ARM Cortex-M7 216MHz",
+        "memory": "512KB RAM, 2MB Flash",
+        "gpio": "50+ GPIO pins",
+        "communication": "UART, SPI, I2C, CAN",
+        "pwm": "16 channels",
+        "adc": "12-bit, 16 channels",
+        "voltage": "3.3V/5V compatible",
+        "dimensions": "85x56mm"
+      },
+      "features": [
+        "High-speed ARM processor",
+        "Extensive I/O capabilities",
+        "Real-time control support",
+        "Multiple communication interfaces",
+        "Arduino-compatible headers",
+        "Built-in motion control peripherals"
+      ],
+      "inStock": true,
+      "stockCount": 67,
+      "tags": [
+        "arm",
+        "high-performance",
+        "real-time",
+        "motion-control"
+      ],
+      "rating": 4.8,
+      "reviews": 142,
+      "warranty": "2 years manufacturer",
+      "weight": 0.15,
+      "dimensions": {
+        "length": 10,
+        "width": 8,
+        "height": 2,
+        "unit": "cm"
+      },
+      "hsCode": "8471.50.01",
+      "originCountry": "US",
+      "shipping": {
+        "weight": "0.15kg",
+        "dimensions": "10x8x2cm",
+        "freeShipping": true,
+        "estimatedDelivery": "1-2 business days"
+      }
+    },
+    {
+      "id": "dev-boards-002",
+      "name": "Lumos Nano Brain",
+      "shortDescription": "Complete Arduino development kit for robot projects",
+      "description": "This is the Lumos Nano Brain, a super tiny development board intended to bring in sensor data and control stuff that are really on the edge.",
+      "price": 30.99,
+      "currency": "USD",
+      "images": [
+        "/products/images/development-boards/uno_main.jpg",
+        "/products/images/development-boards/uno_sub0.jpg"
+      ],
+      "specifications": {
+        "processor": "ATmega2560 16MHz",
+        "memory": "8KB SRAM, 256KB Flash",
+        "gpio": "54 digital I/O pins",
+        "pwm": "15 PWM outputs",
+        "adc": "16 analog inputs",
+        "voltage": "5V operating",
+        "usb": "USB Type-B",
+        "shields": "Arduino shield compatible"
+      },
+      "features": [
+        "STM32G0 microcontroller",
+        "64Mhz CPU speed",
+        "144kb RAM",
+        "Available interfaces in the pins: I2C, SPI, UART",
+        "One 4 pin connector with I2C, UART and 3.3V",
+        "7 I/O pins on connector"
+      ],
+      "inStock": true,
+      "stockCount": 93,
+      "tags": [
+        "arduino",
+        "beginner-friendly",
+        "bundle",
+        "prototyping"
+      ],
+      "rating": 4.6,
+      "reviews": 278,
+      "warranty": "1 year standard",
+      "weight": 0.3,
+      "dimensions": {
+        "length": 15,
+        "width": 12,
+        "height": 5,
+        "unit": "cm"
+      },
+      "hsCode": "8471.50.01",
+      "originCountry": "US",
+      "shipping": {
+        "weight": "0.3kg",
+        "dimensions": "15x12x5cm",
+        "freeShipping": true,
+        "estimatedDelivery": "1-2 business days"
+      }
+    }
+  ]
+}

@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useState } from 'react';
-import { useUser } from '../contexts/UserContext';
+import { useUser } from '@/contexts/UserContext';
 
 const AuthModal = ({ isOpen, onClose, initialMode = 'login' }) => {
   const [mode, setMode] = useState(initialMode);

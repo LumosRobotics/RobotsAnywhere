@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useState } from 'react';
-import { useCart } from '../contexts/CartContext';
+import { useCart } from '@/contexts/CartContext';
 
 const ProductDetail = ({ product, onBack }) => {
   const { addToCart } = useCart();

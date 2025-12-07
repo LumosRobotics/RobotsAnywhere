@@ -1,18 +1,21 @@
-import React, { useState } from 'react';
-import { useCart } from '../contexts/CartContext';
-import { useUser } from '../contexts/UserContext';
+'use client';
 
-const Header = ({ onNavClick, onCartClick, onAuthClick, onAccountClick, onCategorySelect, onSearch, onCategoryClick }) => {
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@/contexts/UserContext';
+
+const Header = ({ onAuthClick }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
-  const { getCartItemCount } = useCart();
   const { isAuthenticated, user, logout } = useUser();
+  const router = useRouter();
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (searchTerm.trim() && onSearch) {
-      onSearch(searchTerm.trim());
+    if (searchTerm.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
+      setSearchTerm('');
     }
   };
 
@@ -28,6 +31,7 @@ const Header = ({ onNavClick, onCartClick, onAuthClick, onAccountClick, onCatego
     try {
       await logout();
       setIsAccountDropdownOpen(false);
+      router.push('/');
     } catch (error) {
       console.error('Logout failed:', error);
       setIsAccountDropdownOpen(false);
@@ -36,46 +40,39 @@ const Header = ({ onNavClick, onCartClick, onAuthClick, onAccountClick, onCatego
 
   const handleAccountAction = (action) => {
     setIsAccountDropdownOpen(false);
-    if (onAccountClick) {
-      onAccountClick(action);
-    }
+    router.push(`/account/${action}`);
   };
 
   const handleCategoryClick = (categoryId) => {
     setIsMenuOpen(false);
-    // Navigate to products page and select the category
-    if (onNavClick) {
-      onNavClick({ preventDefault: () => {} }, 'products');
-    }
-    if (onCategorySelect) {
-      onCategorySelect(categoryId);
-    }
+    router.push(`/products/${categoryId}`);
   };
 
   const handleShopClick = (shopType) => {
     setIsMenuOpen(false);
-    // For now, navigate to products page - can be extended later for specific shop sections
-    if (onNavClick) {
-      onNavClick({ preventDefault: () => {} }, 'products');
-    }
-    // Could add specific filtering logic here based on shopType
-    console.log('Shop section clicked:', shopType);
+    router.push('/products');
   };
 
   const productCategories = [
     { id: 'sensors', name: 'Sensors' },
-    { id: 'actuators', name: 'Actuators' },
-    { id: 'connectivity', name: 'Connectivity' },
-    { id: 'location', name: 'Location' },
-    { id: 'camera', name: 'Camera' },
-    { id: 'industrial', name: 'Industrial Robots' },
-    { id: 'service', name: 'Service Robots' }
+    { id: 'cleaning', name: 'Cleaning Robots' },
+    { id: 'development-boards', name: 'Development Boards' }
   ];
+
+  const scrollToSection = (sectionId) => {
+    router.push('/');
+    setTimeout(() => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 100);
+  };
 
   return (
     <header className="header">
       <div className="header-content">
-        <div className="logo" onClick={(e) => onNavClick(e, 'home')}>
+        <div className="logo" onClick={() => router.push('/')} style={{ cursor: 'pointer' }}>
           <img src="/RobotsAnywhereLogo.png" alt="Robots Anywhere Logo" />
         </div>
 
@@ -83,10 +80,10 @@ const Header = ({ onNavClick, onCartClick, onAuthClick, onAccountClick, onCatego
           <button className="header-nav-button" onClick={toggleMenu}>
             Products
           </button>
-          <button className="header-nav-button" onClick={(e) => onNavClick && onNavClick(e, 'about')}>
+          <button className="header-nav-button" onClick={() => scrollToSection('about')}>
             About
           </button>
-          <button className="header-nav-button" onClick={(e) => onNavClick && onNavClick(e, 'contact')}>
+          <button className="header-nav-button" onClick={() => scrollToSection('contact')}>
             Contact
           </button>
         </div>
@@ -106,7 +103,6 @@ const Header = ({ onNavClick, onCartClick, onAuthClick, onAccountClick, onCatego
             </svg>
           </button>
         </form>
-        
 
         <div className="account-section">
           {isAuthenticated ? (

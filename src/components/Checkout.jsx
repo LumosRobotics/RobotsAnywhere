@@ -1,13 +1,15 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { useCart } from '../contexts/CartContext';
-import { useUser } from '../contexts/UserContext';
-import { useShipping } from '../contexts/ShippingContext';
-import { useNavigate } from 'react-router-dom';
+import { useCart } from '@/contexts/CartContext';
+import { useUser } from '@/contexts/UserContext';
+import { useShipping } from '@/contexts/ShippingContext';
+import { useRouter } from 'next/navigation';
 
 // Initialize Stripe with your publishable key
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
 
 const CheckoutForm = ({ onSuccess, onCancel }) => {
   const stripe = useStripe();
@@ -26,7 +28,7 @@ const CheckoutForm = ({ onSuccess, onCancel }) => {
     error: shippingError,
     setUseMockData
   } = useShipping();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState(null);
@@ -165,12 +167,41 @@ const CheckoutForm = ({ onSuccess, onCancel }) => {
 
       const cardElement = elements.getElement(CardElement);
 
-      // Create a payment method
-      const { error: stripeError, paymentMethod } = await stripe.createPaymentMethod({
-        type: 'card',
-        card: cardElement,
-        billing_details: billingDetails,
+      const shippingBreakdown = getShippingBreakdown();
+      const finalAddress = sameAsBilling ? billingDetails.address : shippingAddress;
+      const totalAmount = getCartTotal() + getShippingTotal();
+
+      // Create payment intent on backend
+      const paymentIntentResponse = await fetch('/api/payments/create-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: totalAmount,
+          currency: 'usd',
+          metadata: {
+            userId: user?.id,
+          },
+        }),
       });
+
+      if (!paymentIntentResponse.ok) {
+        setError('Failed to initialize payment. Please try again.');
+        setProcessing(false);
+        return;
+      }
+
+      const { clientSecret, paymentIntentId } = await paymentIntentResponse.json();
+
+      // Confirm payment with Stripe
+      const { error: stripeError, paymentIntent } = await stripe.confirmCardPayment(
+        clientSecret,
+        {
+          payment_method: {
+            card: cardElement,
+            billing_details: billingDetails,
+          },
+        }
+      );
 
       if (stripeError) {
         setError(stripeError.message);
@@ -178,41 +209,38 @@ const CheckoutForm = ({ onSuccess, onCancel }) => {
         return;
       }
 
-      // TODO: Send paymentMethod.id to your backend to create a payment intent
-      // For now, we'll just create the order locally
+      if (paymentIntent.status === 'succeeded') {
+        // Create order in database
+        const order = await addOrder({
+          items: items.map(item => ({
+            product: item.product,
+            quantity: item.quantity
+          })),
+          subtotal: getCartTotal(),
+          shippingCost: shippingBreakdown.shippingCost,
+          taxesDuties: shippingBreakdown.taxes + shippingBreakdown.duties,
+          total: totalAmount,
+          status: 'paid',
+          paymentIntentId: paymentIntentId,
+          shippingMethod: selectedShippingMethod,
+          shippingAddress: finalAddress
+        });
 
-      const shippingBreakdown = getShippingBreakdown();
-      const finalAddress = sameAsBilling ? billingDetails.address : shippingAddress;
+        if (!order) {
+          setError('Payment succeeded but failed to create order. Please contact support.');
+          setProcessing(false);
+          return;
+        }
 
-      const order = await addOrder({
-        items: items.map(item => ({
-          product: item.product,
-          quantity: item.quantity
-        })),
-        subtotal: getCartTotal(),
-        shippingCost: shippingBreakdown.shippingCost,
-        taxesDuties: shippingBreakdown.taxes + shippingBreakdown.duties,
-        total: getCartTotal() + getShippingTotal(),
-        status: 'pending',
-        paymentMethodId: paymentMethod.id,
-        shippingMethod: selectedShippingMethod,
-        shippingAddress: finalAddress
-      });
-
-      if (!order) {
-        setError('Failed to create order. Please try again.');
+        // Reset processing state
         setProcessing(false);
-        return;
+
+        // Show success page (cart will be cleared there)
+        onSuccess(order);
+      } else {
+        setError('Payment was not successful. Please try again.');
+        setProcessing(false);
       }
-
-      // Don't clear cart here - it will be cleared on the success page
-      // Clearing it here causes the Checkout component's useEffect to redirect
-
-      // Reset processing state
-      setProcessing(false);
-
-      // Show success page (cart will be cleared there)
-      onSuccess(order);
 
     } catch (err) {
       console.error('Checkout error:', err);
@@ -455,10 +483,10 @@ const Checkout = ({ onSuccess, onCancel }) => {
   useEffect(() => {
     // Redirect if cart is empty or user is not authenticated
     if (items.length === 0) {
-      navigate('/');
+      router.push('/');
     }
     if (!isAuthenticated) {
-      navigate('/');
+      router.push('/');
     }
   }, [items, isAuthenticated, navigate]);
 

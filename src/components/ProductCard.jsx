@@ -1,5 +1,7 @@
+'use client';
+
 import React from 'react';
-import { useCart } from '../contexts/CartContext';
+import { useCart } from '@/contexts/CartContext';
 
 const ProductCard = ({ product, onProductClick }) => {
   const { addToCart } = useCart();

@@ -1,10 +1,12 @@
+'use client';
+
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useUser } from '../contexts/UserContext';
+import { useParams, useRouter } from 'next/navigation';
+import { useUser } from '@/contexts/UserContext';
 
 const UserAccount = ({ onBack }) => {
   const { view = 'profile' } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
   const { user, updateProfile } = useUser();
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
@@ -375,19 +377,19 @@ const UserAccount = ({ onBack }) => {
       <div className="account-tabs">
         <button
           className={`tab-btn ${view === 'profile' ? 'active' : ''}`}
-          onClick={() => navigate('/account/profile')}
+          onClick={() => router.push('/account/profile')}
         >
           👤 Profile
         </button>
         <button
           className={`tab-btn ${view === 'orders' ? 'active' : ''}`}
-          onClick={() => navigate('/account/orders')}
+          onClick={() => router.push('/account/orders')}
         >
           📦 Orders
         </button>
         <button
           className={`tab-btn ${view === 'settings' ? 'active' : ''}`}
-          onClick={() => navigate('/account/settings')}
+          onClick={() => router.push('/account/settings')}
         >
           ⚙️ Settings
         </button>

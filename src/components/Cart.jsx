@@ -1,10 +1,12 @@
+'use client';
+
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useCart } from '../contexts/CartContext';
-import { useUser } from '../contexts/UserContext';
+import { useRouter } from 'next/navigation';
+import { useCart } from '@/contexts/CartContext';
+import { useUser } from '@/contexts/UserContext';
 
 const Cart = ({ onClose }) => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const {
     items,
     removeFromCart,
@@ -43,7 +45,7 @@ const Cart = ({ onClose }) => {
 
     // Close cart modal and navigate to checkout
     onClose();
-    navigate('/checkout');
+    router.push('/checkout');
   };
 
   if (items.length === 0) {

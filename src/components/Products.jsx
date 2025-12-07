@@ -1,11 +1,13 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useRouter } from 'next/navigation';
 import ProductList from './ProductList';
 import ProductDetail from './ProductDetail';
 
 const Products = () => {
   const { category, productId } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -40,19 +42,19 @@ const Products = () => {
   }, [category, productId]);
 
   const handleCategorySelect = (categoryId) => {
-    navigate(`/products/${categoryId}`);
+    router.push(`/products/${categoryId}`);
   };
 
   const handleProductSelect = (product) => {
-    navigate(`/products/${product.categoryId || category}/${product.id}`);
+    router.push(`/products/${product.categoryId || category}/${product.id}`);
   };
 
   const handleBackToProducts = () => {
-    navigate(`/products/${category}`);
+    router.push(`/products/${category}`);
   };
 
   const handleBackToCategories = () => {
-    navigate('/products');
+    router.push('/products');
   };
 
 

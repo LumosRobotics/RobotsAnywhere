@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import { useCart } from '../contexts/CartContext';
+import { useCart } from '@/contexts/CartContext';
 import ProductCard from './ProductCard';
 
 const ProductList = ({ category, onProductSelect }) => {

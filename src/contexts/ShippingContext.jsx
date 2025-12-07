@@ -1,3 +1,5 @@
+'use client';
+
 import React, { createContext, useContext, useReducer, useCallback } from 'react';
 import {
   getShippingRates,
@@ -5,7 +7,7 @@ import {
   formatRatesForDisplay,
   validateShippingAddress,
   getMockShippingRates
-} from '../services/easyship';
+} from '@/services/easyship';
 
 const ShippingContext = createContext();
 

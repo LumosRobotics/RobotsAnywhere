@@ -8,7 +8,7 @@
  * You must set up backend endpoints as documented in EASYSHIP_SETUP.md
  */
 
-const API_BASE_URL = import.meta.env.VITE_EASYSHIP_API_URL || '/api';
+const API_BASE_URL = typeof window !== 'undefined' ? (process.env.NEXT_PUBLIC_EASYSHIP_API_URL || '/api') : '/api';
 
 /**
  * Format cart items for EasyShip API

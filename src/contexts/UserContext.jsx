@@ -1,6 +1,8 @@
+'use client';
+
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import { createShipment } from '../services/easyship';
+import { supabase } from '@/lib/supabase';
+import { createShipment } from '@/services/easyship';
 
 const UserContext = createContext();
 
@@ -15,7 +17,7 @@ const userReducer = (state, action) => {
         error: null
       };
     }
-    
+
     case 'LOGIN_FAILURE': {
       return {
         ...state,
@@ -25,7 +27,7 @@ const userReducer = (state, action) => {
         error: action.payload.error
       };
     }
-    
+
     case 'LOGOUT': {
       return {
         ...state,
@@ -35,7 +37,7 @@ const userReducer = (state, action) => {
         error: null
       };
     }
-    
+
     case 'REGISTER_SUCCESS': {
       return {
         ...state,
@@ -45,7 +47,7 @@ const userReducer = (state, action) => {
         error: null
       };
     }
-    
+
     case 'REGISTER_FAILURE': {
       return {
         ...state,
@@ -55,7 +57,7 @@ const userReducer = (state, action) => {
         error: action.payload.error
       };
     }
-    
+
     case 'UPDATE_PROFILE': {
       return {
         ...state,
@@ -63,21 +65,21 @@ const userReducer = (state, action) => {
         error: null
       };
     }
-    
+
     case 'SET_LOADING': {
       return {
         ...state,
         isLoading: action.payload.isLoading
       };
     }
-    
+
     case 'CLEAR_ERROR': {
       return {
         ...state,
         error: null
       };
     }
-    
+
     case 'LOAD_USER': {
       return {
         ...state,
@@ -86,7 +88,7 @@ const userReducer = (state, action) => {
         isLoading: false
       };
     }
-    
+
     default:
       return state;
   }
@@ -106,19 +108,19 @@ export const UserProvider = ({ children }) => {
   // Helper function to create user profile
   const createUserProfile = async (userId, userData) => {
     console.log('Creating profile for user:', userId, 'with data:', userData);
-    
+
     // First check if profile already exists
     const { data: existingProfile } = await supabase
       .from('profiles')
       .select('id')
       .eq('id', userId)
       .single();
-    
+
     if (existingProfile) {
       console.log('Profile already exists for user:', userId);
       return;
     }
-    
+
     const profileParams = {
       user_id: userId,
       first_name: userData.firstName || '',
@@ -130,9 +132,9 @@ export const UserProvider = ({ children }) => {
       address_zip: userData.address?.zipCode || '',
       address_country: userData.address?.country || 'USA'
     };
-    
+
     console.log('Profile parameters being sent:', profileParams);
-    
+
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .insert({
@@ -147,7 +149,7 @@ export const UserProvider = ({ children }) => {
         address_country: userData.address?.country || 'USA'
       })
       .select();
-    
+
     if (profileError) {
       console.error('Profile creation error:', profileError);
       throw profileError;
@@ -160,13 +162,13 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     const getSession = async () => {
       const { data: { session }, error } = await supabase.auth.getSession();
-      
+
       if (error) {
         console.error('Error loading session:', error);
         dispatch({ type: 'LOAD_USER', payload: { user: null } });
         return;
       }
-      
+
       if (session?.user) {
         // Fetch user profile from profiles table
         const { data: profile } = await supabase
@@ -174,7 +176,7 @@ export const UserProvider = ({ children }) => {
           .select('*')
           .eq('id', session.user.id)
           .single();
-        
+
         const userData = {
           id: session.user.id,
           email: session.user.email,
@@ -190,15 +192,15 @@ export const UserProvider = ({ children }) => {
           },
           createdAt: session.user.created_at
         };
-        
+
         dispatch({ type: 'LOAD_USER', payload: { user: userData } });
       } else {
         dispatch({ type: 'LOAD_USER', payload: { user: null } });
       }
     };
-    
+
     getSession();
-    
+
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_OUT' || !session) {
@@ -210,7 +212,7 @@ export const UserProvider = ({ children }) => {
           .select('*')
           .eq('id', session.user.id)
           .single();
-        
+
         if (!profile) {
           console.log('No profile found for confirmed user, creating...');
           // This will only work if we have the user data stored somewhere
@@ -228,31 +230,31 @@ export const UserProvider = ({ children }) => {
         }
       }
     });
-    
+
     return () => subscription.unsubscribe();
   }, []);
 
 
   const login = async (email, password) => {
     dispatch({ type: 'SET_LOADING', payload: { isLoading: true } });
-    
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password
     });
-    
+
     if (error) {
       dispatch({ type: 'LOGIN_FAILURE', payload: { error: error.message } });
       return { success: false, error: error.message };
     }
-    
+
     // Fetch user profile
     const { data: profile } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', data.user.id)
       .single();
-    
+
     const userData = {
       id: data.user.id,
       email: data.user.email,
@@ -268,27 +270,27 @@ export const UserProvider = ({ children }) => {
       },
       createdAt: data.user.created_at
     };
-    
+
     dispatch({ type: 'LOGIN_SUCCESS', payload: { user: userData } });
     return { success: true };
   };
 
   const register = async (userData) => {
     dispatch({ type: 'SET_LOADING', payload: { isLoading: true } });
-    
+
     const { data, error } = await supabase.auth.signUp({
       email: userData.email,
       password: userData.password
     });
-    
+
     if (error) {
       dispatch({ type: 'REGISTER_FAILURE', payload: { error: error.message } });
       return { success: false, error: error.message };
     }
-    
+
     // Always require email confirmation - don't auto-login
     console.log('User registration successful, email confirmation required');
-    
+
     // Store user data temporarily for profile creation after confirmation
     try {
       await createUserProfile(data.user.id, userData);
@@ -297,12 +299,12 @@ export const UserProvider = ({ children }) => {
       console.error('Failed to create profile:', profileError);
       // Continue anyway, profile can be created when user confirms
     }
-    
+
     // Don't set user as authenticated, just clear loading state
     dispatch({ type: 'SET_LOADING', payload: { isLoading: false } });
-    
-    return { 
-      success: true, 
+
+    return {
+      success: true,
       message: 'An email has been sent to the email address you provided. Please confirm your email to complete registration.',
       requiresConfirmation: true
     };
@@ -327,10 +329,10 @@ export const UserProvider = ({ children }) => {
 
   const updateProfile = async (updates) => {
     if (!state.user) return { success: false, error: 'No user logged in' };
-    
+
     // Update profile in Supabase
     const profileUpdates = {};
-    
+
     if (updates.firstName) profileUpdates.first_name = updates.firstName;
     if (updates.lastName) profileUpdates.last_name = updates.lastName;
     if (updates.phone) profileUpdates.phone = updates.phone;
@@ -341,17 +343,17 @@ export const UserProvider = ({ children }) => {
       if (updates.address.zipCode) profileUpdates.address_zip = updates.address.zipCode;
       if (updates.address.country) profileUpdates.address_country = updates.address.country;
     }
-    
+
     const { error } = await supabase
       .from('profiles')
       .update(profileUpdates)
       .eq('id', state.user.id);
-    
+
     if (error) {
       console.error('Profile update error:', error);
       return { success: false, error: error.message };
     }
-    
+
     dispatch({ type: 'UPDATE_PROFILE', payload: { updates } });
     return { success: true };
   };

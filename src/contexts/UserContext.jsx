@@ -238,15 +238,22 @@ export const UserProvider = ({ children }) => {
   const login = async (email, password) => {
     dispatch({ type: 'SET_LOADING', payload: { isLoading: true } });
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
 
-    if (error) {
-      dispatch({ type: 'LOGIN_FAILURE', payload: { error: error.message } });
-      return { success: false, error: error.message };
-    }
+      if (error) {
+        console.error('Supabase login error:', error);
+        dispatch({ type: 'LOGIN_FAILURE', payload: { error: error.message } });
+        return { success: false, error: error.message };
+      }
+
+      if (!data || !data.user) {
+        dispatch({ type: 'LOGIN_FAILURE', payload: { error: 'No user data returned' } });
+        return { success: false, error: 'No user data returned' };
+      }
 
     // Fetch user profile
     const { data: profile } = await supabase
@@ -271,8 +278,14 @@ export const UserProvider = ({ children }) => {
       createdAt: data.user.created_at
     };
 
-    dispatch({ type: 'LOGIN_SUCCESS', payload: { user: userData } });
-    return { success: true };
+      dispatch({ type: 'LOGIN_SUCCESS', payload: { user: userData } });
+      return { success: true };
+    } catch (err) {
+      console.error('Login error:', err);
+      const errorMessage = err.message || 'Network error - Unable to connect to authentication service';
+      dispatch({ type: 'LOGIN_FAILURE', payload: { error: errorMessage } });
+      return { success: false, error: errorMessage };
+    }
   };
 
   const register = async (userData) => {

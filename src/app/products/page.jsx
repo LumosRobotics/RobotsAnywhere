@@ -33,7 +33,7 @@ export default function ProductsPage() {
           Browse our selection of high-quality robotics components and solutions
         </p>
 
-        <div className="category-grid">
+        <div className="categories-grid">
           {categories.map(category => (
             <Link
               key={category.id}

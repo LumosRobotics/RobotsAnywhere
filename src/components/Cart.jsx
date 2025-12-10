@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/contexts/CartContext';
 import { useUser } from '@/contexts/UserContext';
 
-const Cart = ({ onClose }) => {
+const Cart = ({ isOpen, onClose }) => {
   const router = useRouter();
   const {
     items,
@@ -16,6 +16,8 @@ const Cart = ({ onClose }) => {
     getCartItemCount
   } = useCart();
   const { isAuthenticated } = useUser();
+
+  if (!isOpen) return null;
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-US', {
@@ -50,27 +52,33 @@ const Cart = ({ onClose }) => {
 
   if (items.length === 0) {
     return (
-      <div className="cart-container">
-        <div className="cart-header">
-          <h2>Shopping Cart</h2>
-          <button className="close-cart-btn" onClick={onClose}>×</button>
-        </div>
-        <div className="cart-empty">
-          <div className="empty-cart-icon">🛒</div>
-          <h3>Your cart is empty</h3>
-          <p>Add some amazing robot components to get started!</p>
-          <button className="continue-shopping-btn" onClick={onClose}>
-            Continue Shopping
-          </button>
+      <div className="cart-overlay" onClick={onClose}>
+        <div className="cart-modal" onClick={(e) => e.stopPropagation()}>
+          <div className="cart-container">
+            <div className="cart-header">
+              <h2>Shopping Cart</h2>
+              <button className="close-cart-btn" onClick={onClose}>×</button>
+            </div>
+            <div className="cart-empty">
+              <div className="empty-cart-icon">🛒</div>
+              <h3>Your cart is empty</h3>
+              <p>Add some amazing robot components to get started!</p>
+              <button className="continue-shopping-btn" onClick={onClose}>
+                Continue Shopping
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="cart-container">
-      <div className="cart-header">
-        <h2>Shopping Cart ({getCartItemCount()} items)</h2>
+    <div className="cart-overlay" onClick={onClose}>
+      <div className="cart-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="cart-container">
+          <div className="cart-header">
+            <h2>Shopping Cart ({getCartItemCount()} items)</h2>
         <button className="close-cart-btn" onClick={onClose}>×</button>
       </div>
 
@@ -157,6 +165,8 @@ const Cart = ({ onClose }) => {
         <button className="checkout-btn" onClick={handleCheckout}>
           Proceed to Checkout
         </button>
+      </div>
+        </div>
       </div>
     </div>
   );

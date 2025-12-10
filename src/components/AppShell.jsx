@@ -49,13 +49,9 @@ export default function AppShell({ children }) {
         )}
       </button>
 
-      {showCart && (
-        <Cart onClose={handleCartClose} />
-      )}
+      <Cart isOpen={showCart} onClose={handleCartClose} />
 
-      {showAuthModal && (
-        <AuthModal onClose={handleAuthClose} />
-      )}
+      <AuthModal isOpen={showAuthModal} onClose={handleAuthClose} />
     </>
   );
 }

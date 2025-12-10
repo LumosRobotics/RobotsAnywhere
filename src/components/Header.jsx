@@ -86,6 +86,9 @@ const Header = ({ onAuthClick }) => {
           <button className="header-nav-button" onClick={() => scrollToSection('contact')}>
             Contact
           </button>
+          <button className="header-nav-button" onClick={() => router.push('/embedded-design')}>
+            Embedded design services
+          </button>
         </div>
 
         <form className="search-bar" onSubmit={handleSearch}>
